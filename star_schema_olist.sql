@@ -1,0 +1,7 @@
+ALTER TABLE dim_seller 
+    ALTER COLUMN latitude TYPE NUMERIC,
+    ALTER COLUMN longitude TYPE NUMERIC;
+
+ALTER TABLE dim_customer 
+    ALTER COLUMN latitude TYPE NUMERIC,
+    ALTER COLUMN longitude TYPE NUMERIC;
