@@ -467,13 +467,13 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>calc volume</from>
-      <to>calc classes</to>
+      <from>calc classes</from>
+      <to>select product fields</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>calc classes</from>
-      <to>select product fields</to>
+      <from>calc volume</from>
+      <to>calc classes</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -506,8 +506,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>576</xloc>
-      <yloc>144</yloc>
+      <xloc>512</xloc>
+      <yloc>80</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -593,8 +593,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1408</xloc>
-      <yloc>144</yloc>
+      <xloc>1344</xloc>
+      <yloc>80</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -804,6 +804,7 @@
     <fields>
       <field>
         <name>product_id</name>
+        <rename/>
       </field>
       <field>
         <name>product_category_name_1</name>
@@ -815,15 +816,19 @@
       </field>
       <field>
         <name>volume_cm3</name>
+        <rename/>
       </field>
       <field>
         <name>weight_class</name>
+        <rename/>
       </field>
       <field>
         <name>volume_class</name>
+        <rename/>
       </field>
       <field>
         <name>category_group</name>
+        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -836,8 +841,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1184</xloc>
-      <yloc>144</yloc>
+      <xloc>1136</xloc>
+      <yloc>80</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -878,7 +883,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>304</xloc>
+      <xloc>288</xloc>
       <yloc>16</yloc>
       <draw>Y</draw>
     </GUI>
@@ -920,7 +925,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>304</xloc>
+      <xloc>288</xloc>
       <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
@@ -976,8 +981,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>784</xloc>
-      <yloc>144</yloc>
+      <xloc>720</xloc>
+      <yloc>80</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -985,7 +990,7 @@
     <name>calc classes</name>
     <type>ScriptValueMod</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
@@ -1009,7 +1014,8 @@ if (cat == "null") category_group = "unknown";
 else if (cat.indexOf("health") >= 0 || cat.indexOf("beauty") >= 0) category_group = "Health Beauty";
 else if (cat.indexOf("computer") >= 0 || cat.indexOf("electron") >= 0) category_group = "Electronics";
 else if (cat.indexOf("furniture") >= 0 || cat.indexOf("bed") >= 0) category_group = "Home Furniture";
-else if (cat.indexOf("sport") >= 0 || cat.indexOf("leisure") >= 0) category_group = "Sports Leisure";</jsScript_script>
+else if (cat.indexOf("sport") >= 0 || cat.indexOf("leisure") >= 0) category_group = "Sports Leisure";
+</jsScript_script>
       </jsScript>
     </jsScripts>
     <fields>
@@ -1037,6 +1043,14 @@ else if (cat.indexOf("sport") >= 0 || cat.indexOf("leisure") >= 0) category_grou
         <precision>-1</precision>
         <replace>N</replace>
       </field>
+      <field>
+        <name>price_range</name>
+        <rename>price_range</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1047,12 +1061,24 @@ else if (cat.indexOf("sport") >= 0 || cat.indexOf("leisure") >= 0) category_grou
       </output>
     </remotesteps>
     <GUI>
-      <xloc>976</xloc>
-      <yloc>144</yloc>
+      <xloc>928</xloc>
+      <yloc>80</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>
+    <error>
+      <source_step>calc classes</source_step>
+      <target_step>join avg price</target_step>
+      <is_enabled>Y</is_enabled>
+      <nr_valuename/>
+      <descriptions_valuename/>
+      <fields_valuename/>
+      <codes_valuename/>
+      <max_errors/>
+      <max_pct_errors/>
+      <min_pct_rows/>
+    </error>
   </step_error_handling>
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
