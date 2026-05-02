@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>dim_customer</name>
+    <name>dim_product</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -427,341 +427,58 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2026/04/27 17:59:57.808</created_date>
+    <created_date>2026/04/27 18:32:49.029</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2026/04/27 17:59:57.808</modified_date>
-    <key_for_session_key/>
+    <modified_date>2026/04/27 18:32:49.029</modified_date>
+    <key_for_session_key>H4sIAAAAAAAA/wMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
   <order>
     <hop>
-      <from>read costumer csv</from>
-      <to>sort customers</to>
+      <from>select product fields</from>
+      <to>load dim_product</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>read geolocation csv
-</from>
-      <to>sort geolocation</to>
+      <from>read products csv</from>
+      <to>sort products</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>sort geolocation</from>
-      <to>join customer geolocation</to>
+      <from>read translation csv</from>
+      <to>sort transl</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>sort customers</from>
-      <to>join customer geolocation</to>
+      <from>sort products</from>
+      <to>join product translation</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>join customer geolocation</from>
-      <to>select customer fields</to>
+      <from>sort transl</from>
+      <to>join product translation</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>select customer fields</from>
-      <to>calc region</to>
+      <from>join product translation</from>
+      <to>calc volume</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>calc region</from>
-      <to>sort by customer_unique</to>
+      <from>calc volume</from>
+      <to>calc classes</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>sort by customer_unique</from>
-      <to>unique by customer_unique</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>unique by customer_unique</from>
-      <to>load dim_customer</to>
+      <from>calc classes</from>
+      <to>select product fields</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>read costumer csv</name>
-    <type>CsvInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_customers_dataset.csv</filename>
-    <filename_field/>
-    <rownum_field/>
-    <include_filename>N</include_filename>
-    <separator>,</separator>
-    <enclosure>"</enclosure>
-    <header>Y</header>
-    <buffer_size>50000</buffer_size>
-    <lazy_conversion>Y</lazy_conversion>
-    <add_filename_result>N</add_filename_result>
-    <parallel>N</parallel>
-    <newline_possible>N</newline_possible>
-    <format>mixed</format>
-    <encoding/>
-    <fields>
-      <field>
-        <name>customer_id</name>
-        <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>32</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>customer_unique_id</name>
-        <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>32</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>customer_zip_code_prefix</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>customer_city</name>
-        <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>23</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>customer_state</name>
-        <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>2</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>144</xloc>
-      <yloc>64</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>sort customers</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory/>
-    <compress>N</compress>
-    <compress_variable/>
-    <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>customer_zip_code_prefix</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>344</xloc>
-      <yloc>64</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>read geolocation csv
-</name>
-    <type>CsvInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_geolocation_dataset.csv</filename>
-    <filename_field/>
-    <rownum_field/>
-    <include_filename>N</include_filename>
-    <separator>,</separator>
-    <enclosure>"</enclosure>
-    <header>Y</header>
-    <buffer_size>50000</buffer_size>
-    <lazy_conversion>Y</lazy_conversion>
-    <add_filename_result>N</add_filename_result>
-    <parallel>N</parallel>
-    <newline_possible>N</newline_possible>
-    <format>mixed</format>
-    <encoding/>
-    <fields>
-      <field>
-        <name>geolocation_zip_code_prefix</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>geolocation_lat</name>
-        <type>BigNumber</type>
-        <format>#.###############</format>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>19</length>
-        <precision>15</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>geolocation_lng</name>
-        <type>BigNumber</type>
-        <format>#.###############</format>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>19</length>
-        <precision>15</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>geolocation_city</name>
-        <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>9</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>geolocation_state</name>
-        <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>2</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>144</xloc>
-      <yloc>208</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>sort geolocation</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory/>
-    <compress>N</compress>
-    <compress_variable/>
-    <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>geolocation_zip_code_prefix</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>352</xloc>
-      <yloc>208</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>join customer geolocation</name>
+    <name>join product translation</name>
     <type>MergeJoin</type>
     <description/>
     <distribute>Y</distribute>
@@ -772,13 +489,13 @@
       <schema_name/>
     </partitioning>
     <join_type>LEFT OUTER</join_type>
-    <step1>sort customers</step1>
-    <step2>sort geolocation</step2>
+    <step1>sort products</step1>
+    <step2>sort transl</step2>
     <keys_1>
-      <key>customer_zip_code_prefix</key>
+      <key>product_category_name</key>
     </keys_1>
     <keys_2>
-      <key>geolocation_zip_code_prefix</key>
+      <key>product_category_name</key>
     </keys_2>
     <attributes/>
     <cluster_schema/>
@@ -789,119 +506,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>656</xloc>
-      <yloc>128</yloc>
+      <xloc>576</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>select customer fields</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>customer_unique_id</name>
-        <rename>customer_unique</rename>
-      </field>
-      <field>
-        <name>customer_city</name>
-        <rename>city</rename>
-      </field>
-      <field>
-        <name>customer_state</name>
-        <rename>state</rename>
-      </field>
-      <field>
-        <name>geolocation_lat</name>
-        <rename>latitude</rename>
-      </field>
-      <field>
-        <name>geolocation_lng</name>
-        <rename>longitude</rename>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>896</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>calc region</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>var region;
-
-if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
-    region = "Sudeste";
-} else if (state == "PR" || state == "SC" || state == "RS") {
-    region = "Sul";
-} else if (state == "BA" || state == "SE" || state == "AL" || state == "PE" || 
-           state == "PB" || state == "RN" || state == "CE" || state == "PI" || 
-           state == "MA") {
-    region = "Nordeste";
-} else if (state == "GO" || state == "MT" || state == "MS" || state == "DF") {
-    region = "Centro-Oeste";
-} else {
-    region = "Norte";
-}</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>region</name>
-        <rename>region</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1136</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>load dim_customer</name>
+    <name>load dim_product</name>
     <type>DimensionLookup</type>
     <description/>
     <distribute>Y</distribute>
@@ -912,14 +523,14 @@ if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
       <schema_name/>
     </partitioning>
     <schema>public</schema>
-    <table>dim_customer</table>
+    <table>dim_product</table>
     <connection>olist_postgres</connection>
     <commit>100</commit>
     <update>Y</update>
     <fields>
       <key>
-        <name>customer_unique</name>
-        <lookup>customer_unique</lookup>
+        <name>product_id</name>
+        <lookup>product_id</lookup>
       </key>
       <date>
         <name/>
@@ -927,32 +538,37 @@ if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
         <to>date_to</to>
       </date>
       <field>
-        <name>city</name>
-        <lookup>city</lookup>
+        <name>category_name</name>
+        <lookup>category_name</lookup>
         <update>Insert</update>
       </field>
       <field>
-        <name>state</name>
-        <lookup>state</lookup>
+        <name>weight_g</name>
+        <lookup>weight_g</lookup>
         <update>Insert</update>
       </field>
       <field>
-        <name>latitude</name>
-        <lookup>latitude</lookup>
+        <name>volume_cm3</name>
+        <lookup>volume_cm3</lookup>
         <update>Insert</update>
       </field>
       <field>
-        <name>longitude</name>
-        <lookup>longitude</lookup>
+        <name>weight_class</name>
+        <lookup>weight_class</lookup>
         <update>Insert</update>
       </field>
       <field>
-        <name>region</name>
-        <lookup>region</lookup>
+        <name>volume_class</name>
+        <lookup>volume_class</lookup>
+        <update>Insert</update>
+      </field>
+      <field>
+        <name>category_group</name>
+        <lookup>category_group</lookup>
         <update>Insert</update>
       </field>
       <return>
-        <name>sk_customer</name>
+        <name>sk_product</name>
         <rename/>
         <creation_method>tablemax</creation_method>
         <use_autoinc>N</use_autoinc>
@@ -977,13 +593,256 @@ if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1336</xloc>
-      <yloc>128</yloc>
+      <xloc>1408</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>sort by customer_unique</name>
+    <name>read products csv</name>
+    <type>CsvInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_products_dataset.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>Y</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
+    <fields>
+      <field>
+        <name>product_id</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product_category_name</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>33</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product_name_lenght</name>
+        <type>BigNumber</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product_description_lenght</name>
+        <type>BigNumber</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product_photos_qty</name>
+        <type>BigNumber</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product_weight_g</name>
+        <type>BigNumber</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product_length_cm</name>
+        <type>BigNumber</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product_height_cm</name>
+        <type>BigNumber</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>product_width_cm</name>
+        <type>BigNumber</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>96</xloc>
+      <yloc>16</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>read translation csv</name>
+    <type>CsvInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\product_category_name_translation.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>N</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
+    <fields>
+      <field>
+        <name>product_category_name</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>96</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>select product fields</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>product_id</name>
+      </field>
+      <field>
+        <name>product_category_name_1</name>
+        <rename>category_name</rename>
+      </field>
+      <field>
+        <name>product_weight_g</name>
+        <rename>weight_g</rename>
+      </field>
+      <field>
+        <name>volume_cm3</name>
+      </field>
+      <field>
+        <name>weight_class</name>
+      </field>
+      <field>
+        <name>volume_class</name>
+      </field>
+      <field>
+        <name>category_group</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1184</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sort products</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -1002,7 +861,7 @@ if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
     <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>customer_unique</name>
+        <name>product_category_name</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <collator_enabled>N</collator_enabled>
@@ -1019,14 +878,14 @@ if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1232</xloc>
-      <yloc>256</yloc>
+      <xloc>304</xloc>
+      <yloc>16</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>unique by customer_unique</name>
-    <type>Unique</type>
+    <name>sort transl</name>
+    <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1035,14 +894,21 @@ if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <count_rows>N</count_rows>
-    <count_field/>
-    <reject_duplicate_row>N</reject_duplicate_row>
-    <error_description/>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>customer_unique</name>
-        <case_insensitive>N</case_insensitive>
+        <name>product_category_name</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
       </field>
     </fields>
     <attributes/>
@@ -1054,8 +920,135 @@ if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1432</xloc>
-      <yloc>256</yloc>
+      <xloc>304</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>calc volume</name>
+    <type>Calculator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <failIfNoFile>Y</failIfNoFile>
+    <calculation>
+      <field_name>vol_temp</field_name>
+      <calc_type>MULTIPLY</calc_type>
+      <field_a>product_length_cm</field_a>
+      <field_b>product_height_cm</field_b>
+      <field_c/>
+      <value_type>Number</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <calculation>
+      <field_name>volume_cm3</field_name>
+      <calc_type>MULTIPLY</calc_type>
+      <field_a>vol_temp</field_a>
+      <field_b>product_width_cm</field_b>
+      <field_c/>
+      <value_type>Number</value_type>
+      <value_length>-1</value_length>
+      <value_precision>-1</value_precision>
+      <remove>N</remove>
+      <conversion_mask/>
+      <decimal_symbol/>
+      <grouping_symbol/>
+      <currency_symbol/>
+    </calculation>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>784</xloc>
+      <yloc>144</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>calc classes</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var weight = parseFloat("" + product_weight_g);
+var vol = parseFloat("" + volume_cm3);
+
+var weight_class = weight &lt; 500 ? "light" : weight &lt; 2000 ? "medium" : weight &lt; 5000 ? "heavy" : "very_heavy";
+var volume_class = vol &lt; 1000 ? "small" : vol &lt; 10000 ? "medium" : "large";
+var category_group = "Other";
+var cat = "" + product_category_name_1;
+if (cat == "null") category_group = "unknown";
+else if (cat.indexOf("health") >= 0 || cat.indexOf("beauty") >= 0) category_group = "Health Beauty";
+else if (cat.indexOf("computer") >= 0 || cat.indexOf("electron") >= 0) category_group = "Electronics";
+else if (cat.indexOf("furniture") >= 0 || cat.indexOf("bed") >= 0) category_group = "Home Furniture";
+else if (cat.indexOf("sport") >= 0 || cat.indexOf("leisure") >= 0) category_group = "Sports Leisure";</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>weight_class</name>
+        <rename>weight_class</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>volume_class</name>
+        <rename>volume_class</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>category_group</name>
+        <rename>category_group</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>976</xloc>
+      <yloc>144</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

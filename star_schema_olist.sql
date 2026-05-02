@@ -1,7 +1,2 @@
-ALTER TABLE dim_seller 
-    ALTER COLUMN latitude TYPE NUMERIC,
-    ALTER COLUMN longitude TYPE NUMERIC;
-
-ALTER TABLE dim_customer 
-    ALTER COLUMN latitude TYPE NUMERIC,
-    ALTER COLUMN longitude TYPE NUMERIC;
+ALTER TABLE dim_product ALTER COLUMN product_id DROP NOT NULL;
+ALTER TABLE dim_product ALTER COLUMN category_name DROP NOT NULL;
