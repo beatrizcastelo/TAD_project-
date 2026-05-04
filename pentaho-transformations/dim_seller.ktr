@@ -429,7 +429,7 @@
     <created_date>2026/04/27 16:53:59.207</created_date>
     <modified_user>-</modified_user>
     <modified_date>2026/04/27 16:53:59.207</modified_date>
-    <key_for_session_key/>
+    <key_for_session_key>H4sIAAAAAAAA/wMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -452,7 +452,7 @@
     </hop>
     <hop>
       <from>sort geolocation</from>
-      <to>join seller geolocation</to>
+      <to>unique geolocation</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -470,10 +470,15 @@
       <to>load dim_seller</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>unique geolocation</from>
+      <to>join seller geolocation</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
   <step>
-    <name>read sellers csv</name>
-    <type>CsvInput</type>
+    <name>calc region</name>
+    <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -482,64 +487,56 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_sellers_dataset.csv</filename>
-    <filename_field/>
-    <rownum_field/>
-    <include_filename>N</include_filename>
-    <separator>,</separator>
-    <enclosure>"</enclosure>
-    <header>Y</header>
-    <buffer_size>50000</buffer_size>
-    <lazy_conversion>Y</lazy_conversion>
-    <add_filename_result>N</add_filename_result>
-    <parallel>N</parallel>
-    <newline_possible>N</newline_possible>
-    <format>mixed</format>
-    <encoding/>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var region;
+
+if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
+    region = "Sudeste";
+} else if (state == "PR" || state == "SC" || state == "RS") {
+    region = "Sul";
+} else if (state == "BA" || state == "SE" || state == "AL" || state == "PE" || 
+           state == "PB" || state == "RN" || state == "CE" || state == "PI" || 
+           state == "MA") {
+    region = "Nordeste";
+} else if (state == "GO" || state == "MT" || state == "MS" || state == "DF") {
+    region = "Centro-Oeste";
+} else {
+    region = "Norte";
+}
+
+var lat = parseFloat("" + latitude);
+var lng = parseFloat("" + longitude);</jsScript_script>
+      </jsScript>
+    </jsScripts>
     <fields>
       <field>
-        <name>seller_id</name>
+        <name>region</name>
+        <rename>region</rename>
         <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>32</length>
+        <length>-1</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
+        <replace>N</replace>
       </field>
       <field>
-        <name>seller_zip_code_prefix</name>
-        <type>Integer</type>
-        <format>#</format>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>15</length>
-        <precision>0</precision>
-        <trim_type>none</trim_type>
+        <name>lat</name>
+        <rename>lat</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
       </field>
       <field>
-        <name>seller_city</name>
-        <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>25</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-      </field>
-      <field>
-        <name>seller_state</name>
-        <type>String</type>
-        <format/>
-        <currency>EUR</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <length>2</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
+        <name>lng</name>
+        <rename>lng</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
       </field>
     </fields>
     <attributes/>
@@ -551,8 +548,124 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>112</xloc>
-      <yloc>48</yloc>
+      <xloc>1072</xloc>
+      <yloc>128</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>join seller geolocation</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <join_type>LEFT OUTER</join_type>
+    <step1>sort sellers</step1>
+    <step2>unique geolocation</step2>
+    <keys_1>
+      <key>seller_zip_code_prefix</key>
+    </keys_1>
+    <keys_2>
+      <key>geolocation_zip_code_prefix</key>
+    </keys_2>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>688</xloc>
+      <yloc>128</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>load dim_seller</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <schema>public</schema>
+    <table>dim_seller</table>
+    <connection>olist_postgres</connection>
+    <commit>100</commit>
+    <update>Y</update>
+    <fields>
+      <key>
+        <name>seller_id</name>
+        <lookup>seller_id</lookup>
+      </key>
+      <date>
+        <name/>
+        <from>date_from</from>
+        <to>date_to</to>
+      </date>
+      <field>
+        <name>city</name>
+        <lookup>city</lookup>
+        <update>Insert</update>
+      </field>
+      <field>
+        <name>state</name>
+        <lookup>state</lookup>
+        <update>Insert</update>
+      </field>
+      <field>
+        <name>latitude</name>
+        <lookup>latitude</lookup>
+        <update>Insert</update>
+      </field>
+      <field>
+        <name>longitude</name>
+        <lookup>longitude</lookup>
+        <update>Insert</update>
+      </field>
+      <field>
+        <name>region</name>
+        <lookup>region</lookup>
+        <update>Insert</update>
+      </field>
+      <return>
+        <name>sk_seller</name>
+        <rename/>
+        <creation_method>tablemax</creation_method>
+        <use_autoinc>N</use_autoinc>
+        <version>version</version>
+      </return>
+    </fields>
+    <sequence/>
+    <min_year>1900</min_year>
+    <max_year>2199</max_year>
+    <cache_size>5000</cache_size>
+    <preload_cache>N</preload_cache>
+    <use_start_date_alternative>N</use_start_date_alternative>
+    <start_date_alternative>none</start_date_alternative>
+    <start_date_field_name/>
+    <useBatch>N</useBatch>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1264</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -653,8 +766,8 @@
     </GUI>
   </step>
   <step>
-    <name>sort sellers</name>
-    <type>SortRows</type>
+    <name>read sellers csv</name>
+    <type>CsvInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -663,21 +776,64 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory/>
-    <compress>N</compress>
-    <compress_variable/>
-    <unique_rows>N</unique_rows>
+    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_sellers_dataset.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>Y</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
     <fields>
       <field>
+        <name>seller_id</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
         <name>seller_zip_code_prefix</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>seller_city</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>25</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>seller_state</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>2</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
       </field>
     </fields>
     <attributes/>
@@ -689,8 +845,55 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>352</xloc>
+      <xloc>112</xloc>
       <yloc>48</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>select seller fields</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>seller_id</name>
+      </field>
+      <field>
+        <name>seller_city</name>
+        <rename>city</rename>
+      </field>
+      <field>
+        <name>seller_state</name>
+        <rename>state</rename>
+      </field>
+      <field>
+        <name>geolocation_lat</name>
+        <rename>latitude</rename>
+      </field>
+      <field>
+        <name>geolocation_lng</name>
+        <rename>longitude</rename>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>880</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -737,8 +940,8 @@
     </GUI>
   </step>
   <step>
-    <name>join seller geolocation</name>
-    <type>MergeJoin</type>
+    <name>sort sellers</name>
+    <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -747,138 +950,21 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <join_type>LEFT OUTER</join_type>
-    <step1>sort sellers</step1>
-    <step2>sort geolocation</step2>
-    <keys_1>
-      <key>seller_zip_code_prefix</key>
-    </keys_1>
-    <keys_2>
-      <key>geolocation_zip_code_prefix</key>
-    </keys_2>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>688</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>select seller fields</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>seller_id</name>
-        <rename/>
-      </field>
-      <field>
-        <name>seller_city</name>
-        <rename>city</rename>
-      </field>
-      <field>
-        <name>seller_state</name>
-        <rename>state</rename>
-      </field>
-      <field>
-        <name>geolocation_lat</name>
-        <rename>latitude</rename>
-      </field>
-      <field>
-        <name>geolocation_lng</name>
-        <rename>longitude</rename>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>880</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>calc region</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>var region;
-
-if (state == "SP" || state == "RJ" || state == "MG" || state == "ES") {
-    region = "Sudeste";
-} else if (state == "PR" || state == "SC" || state == "RS") {
-    region = "Sul";
-} else if (state == "BA" || state == "SE" || state == "AL" || state == "PE" || 
-           state == "PB" || state == "RN" || state == "CE" || state == "PI" || 
-           state == "MA") {
-    region = "Nordeste";
-} else if (state == "GO" || state == "MT" || state == "MS" || state == "DF") {
-    region = "Centro-Oeste";
-} else {
-    region = "Norte";
-}
-
-var lat = parseFloat("" + latitude);
-var lng = parseFloat("" + longitude);</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>region</name>
-        <rename>region</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>lat</name>
-        <rename>lat</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>lng</name>
-        <rename>lng</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
+        <name>seller_zip_code_prefix</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
       </field>
     </fields>
     <attributes/>
@@ -890,14 +976,14 @@ var lng = parseFloat("" + longitude);</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1072</xloc>
-      <yloc>128</yloc>
+      <xloc>352</xloc>
+      <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>load dim_seller</name>
-    <type>DimensionLookup</type>
+    <name>unique geolocation</name>
+    <type>Unique</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -906,63 +992,16 @@ var lng = parseFloat("" + longitude);</jsScript_script>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <schema>public</schema>
-    <table>dim_seller</table>
-    <connection>olist_postgres</connection>
-    <commit>100</commit>
-    <update>Y</update>
+    <count_rows>N</count_rows>
+    <count_field/>
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <error_description/>
     <fields>
-      <key>
-        <name>seller_id</name>
-        <lookup>seller_id</lookup>
-      </key>
-      <date>
-        <name/>
-        <from>date_from</from>
-        <to>date_to</to>
-      </date>
       <field>
-        <name>city</name>
-        <lookup>city</lookup>
-        <update>Insert</update>
+        <name>geolocation_zip_code_prefix</name>
+        <case_insensitive>Y</case_insensitive>
       </field>
-      <field>
-        <name>state</name>
-        <lookup>state</lookup>
-        <update>Insert</update>
-      </field>
-      <field>
-        <name>latitude</name>
-        <lookup>latitude</lookup>
-        <update>Insert</update>
-      </field>
-      <field>
-        <name>longitude</name>
-        <lookup>longitude</lookup>
-        <update>Insert</update>
-      </field>
-      <field>
-        <name>region</name>
-        <lookup>region</lookup>
-        <update>Insert</update>
-      </field>
-      <return>
-        <name>sk_seller</name>
-        <rename/>
-        <creation_method>tablemax</creation_method>
-        <use_autoinc>N</use_autoinc>
-        <version>version</version>
-      </return>
     </fields>
-    <sequence/>
-    <min_year>1900</min_year>
-    <max_year>2199</max_year>
-    <cache_size>5000</cache_size>
-    <preload_cache>N</preload_cache>
-    <use_start_date_alternative>N</use_start_date_alternative>
-    <start_date_alternative>none</start_date_alternative>
-    <start_date_field_name/>
-    <useBatch>N</useBatch>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -972,8 +1011,8 @@ var lng = parseFloat("" + longitude);</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1264</xloc>
-      <yloc>128</yloc>
+      <xloc>512</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

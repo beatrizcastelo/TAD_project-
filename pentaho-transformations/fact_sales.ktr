@@ -664,7 +664,7 @@ if (full_date != null) {
     </remotesteps>
     <GUI>
       <xloc>576</xloc>
-      <yloc>352</yloc>
+      <yloc>432</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
