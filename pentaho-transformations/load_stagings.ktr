@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>fact_sales</name>
+    <name>load_stagings</name>
     <description/>
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
     </parameters>
@@ -407,7 +408,7 @@
       <offset>0.0</offset>
       <maxdiff>0.0</maxdiff>
     </maxdate>
-    <size_rowset>200000</size_rowset>
+    <size_rowset>10000</size_rowset>
     <sleep_time_empty>50</sleep_time_empty>
     <sleep_time_full>50</sleep_time_full>
     <unique_connections>N</unique_connections>
@@ -436,240 +437,28 @@
   </notepads>
   <order>
     <hop>
-      <from>read items csv</from>
-      <to>lookup sk_order</to>
+      <from>read payments csv</from>
+      <to>load staging payments</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>lookup sk_order</from>
-      <to>lookup sk_product</to>
+      <from>read customers csv</from>
+      <to>load staging customers</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>lookup sk_product</from>
-      <to>lookup sk_seller</to>
+      <from>read orders csv</from>
+      <to>load staging orders</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>lookup sk_seller</from>
-      <to>lookup customer_id</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>lookup customer_id</from>
-      <to>lookup customer_unique_id</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>lookup customer_unique_id</from>
-      <to>lookup sk_customer</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>lookup sk_customer</from>
-      <to>lookup order dates</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>lookup sk_date</from>
-      <to>lookup payment info</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>lookup payment info</from>
-      <to>calc delivery fields</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>calc delivery fields</from>
-      <to>select fact fields</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>select fact fields</from>
-      <to>load fact_sales</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>lookup order dates</from>
-      <to>extract date parts for sk_date</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>extract date parts for sk_date</from>
-      <to>lookup sk_date</to>
+      <from>read items to staging</from>
+      <to>load staging items</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>calc delivery fields</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>// 1. Inicializar métricas
-var actual_delivery_days = 0;
-var delay_days = 0;
-var is_late_delivery = 0;
-
-// 2. Cálculo usando "full_date" (o nome novo que deste no lookup)
-if (order_delivered_customer_date != null &amp;&amp; full_date != null) {
-    // Converter para objetos de data caso venham como String
-    var d1 = new Date(order_delivered_customer_date);
-    var d2 = new Date(full_date);
-    
-    var timeDiff = d1.getTime() - d2.getTime();
-    actual_delivery_days = Math.floor(timeDiff / (1000 * 3600 * 24));
-}
-
-// 3. Cálculo do atraso
-if (order_delivered_customer_date != null &amp;&amp; order_estimated_delivery_date != null) {
-    var d_deliv = new Date(order_delivered_customer_date);
-    var d_est = new Date(order_estimated_delivery_date);
-    
-    var delayDiff = d_deliv.getTime() - d_est.getTime();
-    delay_days = Math.floor(delayDiff / (1000 * 3600 * 24));
-    
-    is_late_delivery = (delay_days > 0) ? 1 : 0;
-}
-
-// 4. Limpeza final (Anti-NaN)
-if (isNaN(actual_delivery_days)) actual_delivery_days = 0;
-if (isNaN(delay_days)) delay_days = 0;</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>actual_delivery_days</name>
-        <rename>actual_delivery_days</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>delay_days</name>
-        <rename>delay_days</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>is_late_delivery</name>
-        <rename>is_late_delivery</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>816</xloc>
-      <yloc>272</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>extract date parts for sk_date</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>
-var fd_year = 0; var fd_month = 0; var fd_day = 0; var fd_hour = 0;
-if (full_date != null) {
-  var s = "" + full_date;
-  if (s.length >= 13) {
-    fd_year  = parseInt(s.substring(0,4), 10);
-    fd_month = parseInt(s.substring(5,7), 10);
-    fd_day   = parseInt(s.substring(8,10), 10);
-    fd_hour  = parseInt(s.substring(11,13), 10);
-  }
-}
-        </jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>fd_year</name>
-        <rename>fd_year</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>fd_month</name>
-        <rename>fd_month</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>fd_day</name>
-        <rename>fd_day</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>fd_hour</name>
-        <rename>fd_hour</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>576</xloc>
-      <yloc>352</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>load fact_sales</name>
+    <name>load staging payments</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -680,8 +469,8 @@ if (full_date != null) {
       <schema_name/>
     </partitioning>
     <connection>olist_postgres</connection>
-    <schema>public</schema>
-    <table>fact_sales</table>
+    <schema/>
+    <table>staging_payments</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -707,14 +496,14 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1016</xloc>
-      <yloc>144</yloc>
+      <xloc>816</xloc>
+      <yloc>32</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>lookup customer_id</name>
-    <type>DBLookup</type>
+    <name>load staging orders</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -724,28 +513,24 @@ if (full_date != null) {
       <schema_name/>
     </partitioning>
     <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>staging_orders</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>order_id</name>
-        <field>order_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>customer_id</name>
-        <rename>customer_id</rename>
-        <default/>
-        <type>String</type>
-      </value>
-    </lookup>
+    <schema/>
+    <table>staging_orders</table>
+    <commit>1000</commit>
+    <truncate>Y</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>N</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+    </fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -755,14 +540,14 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>304</xloc>
-      <yloc>272</yloc>
+      <xloc>272</xloc>
+      <yloc>32</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>lookup customer_unique_id</name>
-    <type>DBLookup</type>
+    <name>read orders csv</name>
+    <type>CsvInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -771,89 +556,77 @@ if (full_date != null) {
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>staging_customers</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>customer_id</name>
-        <field>customer_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>customer_unique_id</name>
-        <rename>customer_unique</rename>
-        <default/>
-        <type>String</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>304</xloc>
-      <yloc>144</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>lookup order dates</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>staging_orders</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
+    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_orders_dataset.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>N</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
+    <fields>
+      <field>
         <name>order_id</name>
-        <field>order_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>customer_id</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
         <name>order_purchase_timestamp</name>
-        <rename>full_date</rename>
-        <default>1900-01-01 00:00:00</default>
         <type>String</type>
-      </value>
-      <value>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
         <name>order_delivered_customer_date</name>
-        <rename>order_delivered_customer_date</rename>
-        <default/>
         <type>String</type>
-      </value>
-      <value>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
         <name>order_estimated_delivery_date</name>
-        <rename>order_estimated_delivery_date</rename>
-        <default/>
         <type>String</type>
-      </value>
-    </lookup>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -863,14 +636,162 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>576</xloc>
-      <yloc>272</yloc>
+      <xloc>80</xloc>
+      <yloc>32</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>lookup payment info</name>
-    <type>DBLookup</type>
+    <name>read payments csv</name>
+    <type>CsvInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_order_payments_dataset.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>N</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
+    <fields>
+      <field>
+        <name>order_id</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>payment_sequential</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>payment_type</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>11</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>payment_installments</name>
+        <type>Integer</type>
+        <format>#</format>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>15</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>624</xloc>
+      <yloc>32</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>read customers csv</name>
+    <type>CsvInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_customers_dataset.csv</filename>
+    <filename_field/>
+    <rownum_field/>
+    <include_filename>N</include_filename>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <header>Y</header>
+    <buffer_size>50000</buffer_size>
+    <lazy_conversion>N</lazy_conversion>
+    <add_filename_result>N</add_filename_result>
+    <parallel>N</parallel>
+    <newline_possible>N</newline_possible>
+    <format>mixed</format>
+    <encoding/>
+    <fields>
+      <field>
+        <name>customer_id</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>customer_unique_id</name>
+        <type>String</type>
+        <format/>
+        <currency>EUR</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <length>32</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>624</xloc>
+      <yloc>192</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>load staging customers</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -880,34 +801,24 @@ if (full_date != null) {
       <schema_name/>
     </partitioning>
     <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>staging_payments</table>
-      <orderby>payment_sequential ASC</orderby>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>order_id</name>
-        <field>order_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>payment_type</name>
-        <rename>payment_type</rename>
-        <default>not_defined</default>
-        <type>String</type>
-      </value>
-      <value>
-        <name>payment_installments</name>
-        <rename>payment_installments</rename>
-        <default>0</default>
-        <type>Integer</type>
-      </value>
-    </lookup>
+    <schema/>
+    <table>staging_customers</table>
+    <commit>1000</commit>
+    <truncate>Y</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>N</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+    </fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -918,13 +829,13 @@ if (full_date != null) {
     </remotesteps>
     <GUI>
       <xloc>816</xloc>
-      <yloc>432</yloc>
+      <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>lookup sk_customer</name>
-    <type>DBLookup</type>
+    <name>load staging items</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -934,28 +845,24 @@ if (full_date != null) {
       <schema_name/>
     </partitioning>
     <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>dim_customer</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>customer_unique</name>
-        <field>customer_unique</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>sk_customer</name>
-        <rename>sk_customer</rename>
-        <default>0</default>
-        <type>Integer</type>
-      </value>
-    </lookup>
+    <schema/>
+    <table>staging_items</table>
+    <commit>1000</commit>
+    <truncate>Y</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>N</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+    </fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -965,223 +872,13 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>576</xloc>
-      <yloc>144</yloc>
+      <xloc>272</xloc>
+      <yloc>176</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>lookup sk_date</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>dim_date</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>fd_year</name>
-        <field>date_year</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>fd_month</name>
-        <field>date_month</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>fd_day</name>
-        <field>date_day</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>fd_hour</name>
-        <field>hour</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>sk_date</name>
-        <rename>sk_date</rename>
-        <default>0</default>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>688</xloc>
-      <yloc>544</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>lookup sk_order</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>dim_order</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>order_id</name>
-        <field>order_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>sk_order</name>
-        <rename>sk_order</rename>
-        <default>0</default>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>80</xloc>
-      <yloc>272</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>lookup sk_product</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>dim_product</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>product_id</name>
-        <field>product_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>sk_product</name>
-        <rename>sk_product</rename>
-        <default>0</default>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>80</xloc>
-      <yloc>432</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>lookup sk_seller</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>olist_postgres</connection>
-    <cache>Y</cache>
-    <cache_load_all>Y</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>dim_seller</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>seller_id</name>
-        <field>seller_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>sk_seller</name>
-        <rename>sk_seller</rename>
-        <default>0</default>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>304</xloc>
-      <yloc>432</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>read items csv</name>
+    <name>read items to staging</name>
     <type>CsvInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -1272,71 +969,7 @@ if (full_date != null) {
     </remotesteps>
     <GUI>
       <xloc>80</xloc>
-      <yloc>144</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>select fact fields</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>sk_order</name>
-      </field>
-      <field>
-        <name>sk_product</name>
-      </field>
-      <field>
-        <name>sk_seller</name>
-      </field>
-      <field>
-        <name>sk_customer</name>
-      </field>
-      <field>
-        <name>sk_date</name>
-      </field>
-      <field>
-        <name>price</name>
-      </field>
-      <field>
-        <name>freight_value</name>
-      </field>
-      <field>
-        <name>payment_type</name>
-      </field>
-      <field>
-        <name>payment_installments</name>
-      </field>
-      <field>
-        <name>actual_delivery_days</name>
-      </field>
-      <field>
-        <name>delay_days</name>
-      </field>
-      <field>
-        <name>is_late_delivery</name>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>816</xloc>
-      <yloc>144</yloc>
+      <yloc>176</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
