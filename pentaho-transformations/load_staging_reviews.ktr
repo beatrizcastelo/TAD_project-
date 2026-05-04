@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>dim_order</name>
+    <name>load_staging_reviews</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -437,72 +437,11 @@
   </notepads>
   <order>
     <hop>
-      <from>read orders csv</from>
-      <to>lookup review score</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>lookup review score</from>
-      <to>calc is_negative</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>calc is_negative</from>
-      <to>select order fields</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>select order fields</from>
-      <to>load dim_order!</to>
+      <from>read reviews csv</from>
+      <to>load staging reviews</to>
       <enabled>Y</enabled>
     </hop>
   </order>
-  <step>
-    <name>calc is_negative</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>//Script here
-var score = review_score == null ? 99 : parseInt("" + review_score);
-var is_negative_review = (score &lt;= 2) ? 1 : 0;</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>is_negative_review</name>
-        <rename>is_negative_review</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>512</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
   <step>
     <name>load dim_order</name>
     <type>DimensionLookup</type>
@@ -576,55 +515,7 @@ var is_negative_review = (score &lt;= 2) ? 1 : 0;</jsScript_script>
     </GUI>
   </step>
   <step>
-    <name>lookup review score</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>olist_postgres</connection>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema>public</schema>
-      <table>staging_reviews</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>order_id</name>
-        <field>order_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>review_score</name>
-        <rename>review_score</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>304</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>read orders csv</name>
+    <name>read reviews csv</name>
     <type>CsvInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -634,7 +525,7 @@ var is_negative_review = (score &lt;= 2) ? 1 : 0;</jsScript_script>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_orders_dataset.csv</filename>
+    <filename>C:\Users\cataf\Desktop\MECD\4o_Semestre\TAD\project\data\olist_order_reviews_dataset.csv</filename>
     <filename_field/>
     <rownum_field/>
     <include_filename>N</include_filename>
@@ -661,14 +552,14 @@ var is_negative_review = (score &lt;= 2) ? 1 : 0;</jsScript_script>
         <trim_type>none</trim_type>
       </field>
       <field>
-        <name>order_status</name>
-        <type>String</type>
-        <format/>
+        <name>review_score</name>
+        <type>Integer</type>
+        <format>#</format>
         <currency>EUR</currency>
         <decimal>.</decimal>
         <group>,</group>
-        <length>9</length>
-        <precision>-1</precision>
+        <length>15</length>
+        <precision>0</precision>
         <trim_type>none</trim_type>
       </field>
     </fields>
@@ -687,8 +578,8 @@ var is_negative_review = (score &lt;= 2) ? 1 : 0;</jsScript_script>
     </GUI>
   </step>
   <step>
-    <name>select order fields</name>
-    <type>SelectValues</type>
+    <name>load staging reviews</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -697,127 +588,25 @@ var is_negative_review = (score &lt;= 2) ? 1 : 0;</jsScript_script>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <fields>
-      <field>
-        <name>order_id</name>
-      </field>
-      <field>
-        <name>order_status</name>
-      </field>
-      <field>
-        <name>review_score</name>
-      </field>
-      <field>
-        <name>is_negative_review</name>
-      </field>
-      <select_unspecified>N</select_unspecified>
-      <meta>
-        <name>review_score</name>
-        <rename>review_score</rename>
-        <type>Integer</type>
-        <length>9</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>
-      <meta>
-        <name>is_negative_review</name>
-        <rename>is_negative_review</rename>
-        <type>Integer</type>
-        <length>16</length>
-        <precision>2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>704</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>load dim_order!</name>
-    <type>DimensionLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <schema>public</schema>
-    <table>dim_order</table>
     <connection>olist_postgres</connection>
-    <commit>100</commit>
-    <update>Y</update>
+    <schema/>
+    <table>staging_reviews</table>
+    <commit>1000</commit>
+    <truncate>Y</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>N</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
     <fields>
-      <key>
-        <name>order_id</name>
-        <lookup>order_id</lookup>
-      </key>
-      <date>
-        <name/>
-        <from>date_from</from>
-        <to>date_to</to>
-      </date>
-      <field>
-        <name>order_status</name>
-        <lookup>order_status</lookup>
-        <update>Insert</update>
-      </field>
-      <field>
-        <name>review_score</name>
-        <lookup>review_score</lookup>
-        <update>Insert</update>
-      </field>
-      <field>
-        <name>is_negative_review</name>
-        <lookup>is_negative_review</lookup>
-        <update>Insert</update>
-      </field>
-      <return>
-        <name>sk_order</name>
-        <rename/>
-        <creation_method>tablemax</creation_method>
-        <use_autoinc>N</use_autoinc>
-        <version>version</version>
-      </return>
     </fields>
-    <sequence/>
-    <min_year>1900</min_year>
-    <max_year>2199</max_year>
-    <cache_size>5000</cache_size>
-    <preload_cache>N</preload_cache>
-    <use_start_date_alternative>N</use_start_date_alternative>
-    <start_date_alternative>none</start_date_alternative>
-    <start_date_field_name/>
-    <useBatch>N</useBatch>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -827,7 +616,7 @@ var is_negative_review = (score &lt;= 2) ? 1 : 0;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>928</xloc>
+      <xloc>312</xloc>
       <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
