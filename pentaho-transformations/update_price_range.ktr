@@ -434,19 +434,11 @@
   </info>
   <notepads>
     <notepad>
-      <note>LÓGICA:
-1. Lê fact_sales do PostgreSQL (sk_product, price)
-2. Agrega por sk_product → avg_price
-3. Calcula price_range via JavaScript:
-   low     → avg &lt; 50
-   medium  → avg &lt; 150
-   high    → avg &lt; 500
-   premium → avg >= 500
-4. Actualiza dim_product.price_range via UPDATE SQL</note>
-      <xloc>32</xloc>
-      <yloc>240</yloc>
-      <width>494</width>
-      <heigth>217</heigth>
+      <note/>
+      <xloc>1456</xloc>
+      <yloc>464</yloc>
+      <width>20</width>
+      <heigth>20</heigth>
       <fontname>Arial</fontname>
       <fontsize>10</fontsize>
       <fontbold>N</fontbold>

@@ -584,8 +584,8 @@ if (isNaN(delay_days)) delay_days = 0;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>816</xloc>
-      <yloc>272</yloc>
+      <xloc>1056</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -683,7 +683,7 @@ if (full_date != null) {
     <schema>public</schema>
     <table>fact_sales</table>
     <commit>1000</commit>
-    <truncate>Y</truncate>
+    <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>Y</use_batch>
     <specify_fields>N</specify_fields>
@@ -707,8 +707,8 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1016</xloc>
-      <yloc>144</yloc>
+      <xloc>1184</xloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -732,7 +732,7 @@ if (full_date != null) {
       <table>staging_orders</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
+      <eat_row_on_failure>Y</eat_row_on_failure>
       <key>
         <name>order_id</name>
         <field>order_id</field>
@@ -755,8 +755,8 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>304</xloc>
-      <yloc>272</yloc>
+      <xloc>384</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -804,7 +804,7 @@ if (full_date != null) {
     </remotesteps>
     <GUI>
       <xloc>304</xloc>
-      <yloc>144</yloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -863,8 +863,8 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>576</xloc>
-      <yloc>272</yloc>
+      <xloc>656</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -917,7 +917,7 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>816</xloc>
+      <xloc>976</xloc>
       <yloc>432</yloc>
       <draw>Y</draw>
     </GUI>
@@ -966,7 +966,7 @@ if (full_date != null) {
     </remotesteps>
     <GUI>
       <xloc>576</xloc>
-      <yloc>144</yloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1031,8 +1031,8 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>688</xloc>
-      <yloc>544</yloc>
+      <xloc>784</xloc>
+      <yloc>432</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1079,8 +1079,8 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>80</xloc>
-      <yloc>272</yloc>
+      <xloc>160</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1272,7 +1272,7 @@ if (full_date != null) {
     </remotesteps>
     <GUI>
       <xloc>80</xloc>
-      <yloc>144</yloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1335,8 +1335,8 @@ if (full_date != null) {
       </output>
     </remotesteps>
     <GUI>
-      <xloc>816</xloc>
-      <yloc>144</yloc>
+      <xloc>976</xloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
